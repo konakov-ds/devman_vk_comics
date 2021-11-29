@@ -34,20 +34,8 @@ def load_img(img_url, name, dir_path):
         img.write(response.content)
 
 
-def get_vk_groups(url, access_token):
-    params = {
-        'access_token': access_token,
-        'v': '5.131'
-    }
+def get_wall_upload_server(url, group_id, access_token):
 
-    response = requests.get(url, params=params)
-    response.raise_for_status()
-
-    return response.json()
-
-
-def get_wall_upload_server(group_id, access_token):
-    url = 'https://api.vk.com/method/photos.getWallUploadServer/'
     params = {
         'access_token': access_token,
         'group_id': group_id,
@@ -81,8 +69,10 @@ def send_photo_to_server(url, dir_path, photo):
             print('Something wrong with send photo to server')
 
 
-def save_photo_to_wall(group_id, access_token, server, photo, hash):
-    url = 'https://api.vk.com/method/photos.saveWallPhoto/'
+def save_photo_to_wall(
+        url, group_id, access_token, server, photo, hash
+):
+
     params = {
         'server': server,
         'photo': photo,
@@ -107,9 +97,10 @@ def save_photo_to_wall(group_id, access_token, server, photo, hash):
         print('Something wrong with save photo to wall')
 
 
-def post_photo_to_wall(access_token, message, group_id, owner_id, media_id):
+def post_photo_to_wall(
+        url, access_token, message, group_id, owner_id, media_id
+):
     attachments = f'photo{owner_id}_{media_id}'
-    url = 'https://api.vk.com/method/wall.post/'
     params = {
         'owner_id': f'-{group_id}',
         'from_group': 1,
@@ -138,18 +129,19 @@ def save_img_pipeline(dir_name, comics_id):
 
 
 def post_photo_pipeline(
-        dir_name, photo, img_comment, group_id, access_token
+        dir_name, photo, img_comment, group_id, access_token,
+        server_url, wall_photo_url, wall_post_url
 ):
-    img_server_url = get_wall_upload_server(group_id, access_token)
+    img_server_url = get_wall_upload_server(server_url, group_id, access_token)
     response_server = send_photo_to_server(
         img_server_url, dir_name, photo
     )
     response_wall = save_photo_to_wall(
-        group_id, access_token, *response_server
+        wall_photo_url, group_id, access_token, *response_server
     )
 
     response_post = post_photo_to_wall(
-        access_token, img_comment, group_id, *response_wall
+        wall_post_url, access_token, img_comment, group_id, *response_wall
     )
     if response_post.get('response'):
         print('Successfully post photo!')
@@ -168,6 +160,9 @@ if __name__ == '__main__':
     dir_name = env('DIR_NAME')
 
     xkcd_api_url = 'https://xkcd.com/info.0.json'
+    server_url = 'https://api.vk.com/method/photos.getWallUploadServer/'
+    wall_photo_url = 'https://api.vk.com/method/photos.saveWallPhoto/'
+    wall_post_url = 'https://api.vk.com/method/wall.post/'
 
     amount_comics = get_amount_comics(xkcd_api_url)
     comics_random_id = random.choice(range(amount_comics))
@@ -177,5 +172,6 @@ if __name__ == '__main__':
     )
 
     post_photo_pipeline(
-        dir_name, img_name, comics_img_comment, group_id, access_token
+        dir_name, img_name, comics_img_comment, group_id, access_token,
+        server_url, wall_photo_url, wall_post_url
     )
