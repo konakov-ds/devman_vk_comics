@@ -169,7 +169,7 @@ if __name__ == '__main__':
     env = Env()
     env.read_env()
 
-    access_token = env('ACCESS_TOKEN')
+    vk_access_token = env('VK_ACCESS_TOKEN')
     group_id = env('GROUP_ID')
     dir_name = env('DIR_NAME')
 
@@ -183,5 +183,5 @@ if __name__ == '__main__':
     )
 
     post_photo(
-        dir_name, img_name, comics_img_comment, group_id, access_token
+        dir_name, img_name, comics_img_comment, group_id, vk_access_token
     )
