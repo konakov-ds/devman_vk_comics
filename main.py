@@ -22,8 +22,7 @@ def get_amount_comics(url):
     response = requests.get(url)
     response.raise_for_status()
     response_extraction = response.json()
-    if response_extraction.get('num'):
-        return response_extraction['num']
+    return response_extraction['num']
 
 
 def create_comics_url(comics_id):
@@ -139,7 +138,7 @@ def post_photo_to_wall(
     return response.json()
 
 
-def save_img_pipeline(dir_name, comics_id):
+def save_img(dir_name, comics_id):
     os.makedirs(dir_name, exist_ok=True)
 
     comics_url = create_comics_url(comics_id)
@@ -151,7 +150,7 @@ def save_img_pipeline(dir_name, comics_id):
     return comics_img_comment, img_name
 
 
-def post_photo_pipeline(
+def post_photo(
         dir_name, photo, img_comment, group_id, access_token,
         server_url, wall_photo_url, wall_post_url
 ):
@@ -186,11 +185,11 @@ if __name__ == '__main__':
     amount_comics = get_amount_comics(xkcd_api_url)
     comics_random_id = random.choice(range(amount_comics))
 
-    comics_img_comment, img_name = save_img_pipeline(
+    comics_img_comment, img_name = save_img(
         dir_name, comics_random_id
     )
 
-    post_photo_pipeline(
+    post_photo(
         dir_name, img_name, comics_img_comment, group_id, access_token,
         server_url, wall_photo_url, wall_post_url
     )
