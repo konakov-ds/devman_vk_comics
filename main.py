@@ -47,15 +47,16 @@ def load_img(img_url, name, dir_path):
         img.write(response.content)
 
 
-def get_wall_upload_server(url, group_id, access_token):
+def get_wall_upload_server(group_id, access_token):
 
+    server_url = 'https://api.vk.com/method/photos.getWallUploadServer/'
     params = {
         'access_token': access_token,
         'group_id': group_id,
         'v': '5.131'
     }
 
-    response = requests.get(url, params=params)
+    response = requests.get(server_url, params=params)
     response.raise_for_status()
     response_extraction = response.json()
     raise_vk_api_error(response_extraction)
@@ -64,6 +65,7 @@ def get_wall_upload_server(url, group_id, access_token):
 
 
 def send_photo_to_server(url, dir_path, photo):
+
     img_path = os.path.join(dir_path, photo)
     with open(img_path, 'rb') as file:
         files = {
@@ -86,9 +88,10 @@ def send_photo_to_server(url, dir_path, photo):
 
 
 def save_photo_to_wall(
-        url, group_id, access_token, server, photo, vk_hash
+        group_id, access_token, server, photo, vk_hash
 ):
 
+    wall_photo_url = 'https://api.vk.com/method/photos.saveWallPhoto/'
     params = {
         'server': server,
         'photo': photo,
@@ -98,7 +101,7 @@ def save_photo_to_wall(
         'v': '5.131',
     }
 
-    response = requests.post(url, params=params)
+    response = requests.post(wall_photo_url, params=params)
     response.raise_for_status()
     response_extraction = response.json()
     raise_vk_api_error(response_extraction)
@@ -116,8 +119,9 @@ def save_photo_to_wall(
 
 
 def post_photo_to_wall(
-        url, access_token, message, group_id, owner_id, media_id
+        access_token, message, group_id, owner_id, media_id
 ):
+    wall_post_url = 'https://api.vk.com/method/wall.post/'
     attachments = f'photo{owner_id}_{media_id}'
     params = {
         'owner_id': f'-{group_id}',
@@ -128,7 +132,7 @@ def post_photo_to_wall(
         'v': '5.131',
     }
 
-    response = requests.post(url, params=params)
+    response = requests.post(wall_post_url, params=params)
     response.raise_for_status()
     response_extraction = response.json()
     raise_vk_api_error(response_extraction)
@@ -152,18 +156,15 @@ def save_img(dir_name, comics_id):
 
 def post_photo(
         dir_name, photo, img_comment, group_id, access_token,
-        server_url, wall_photo_url, wall_post_url
 ):
-    img_server_url = get_wall_upload_server(server_url, group_id, access_token)
-    server_response = send_photo_to_server(
-        img_server_url, dir_name, photo
-    )
+    img_server_url = get_wall_upload_server(group_id, access_token)
+    server_response = send_photo_to_server(img_server_url, dir_name, photo)
     wall_response = save_photo_to_wall(
-        wall_photo_url, group_id, access_token, *server_response
+        group_id, access_token, *server_response
     )
 
     post_photo_to_wall(
-        wall_post_url, access_token, img_comment, group_id, *wall_response
+        access_token, img_comment, group_id, *wall_response
     )
     os.remove(os.path.join(dir_name, photo))
 
@@ -178,9 +179,6 @@ if __name__ == '__main__':
     dir_name = env('DIR_NAME')
 
     xkcd_api_url = 'https://xkcd.com/info.0.json'
-    server_url = 'https://api.vk.com/method/photos.getWallUploadServer/'
-    wall_photo_url = 'https://api.vk.com/method/photos.saveWallPhoto/'
-    wall_post_url = 'https://api.vk.com/method/wall.post/'
 
     comics_amount = get_amount_comics(xkcd_api_url)
     comics_random_id = random.choice(range(comics_amount))
@@ -190,6 +188,5 @@ if __name__ == '__main__':
     )
 
     post_photo(
-        dir_name, img_name, comics_img_comment, group_id, access_token,
-        server_url, wall_photo_url, wall_post_url
+        dir_name, img_name, comics_img_comment, group_id, access_token
     )
