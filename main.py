@@ -61,27 +61,27 @@ def send_photo_to_server(url, dir_path, photo):
             'photo': file,
         }
         response = requests.post(url, files=files)
-        response.raise_for_status()
-        response_extraction = response.json()
-        params_from_server = [
-            response_extraction.get('server'),
-            response_extraction.get('photo'),
-            response_extraction.get('hash'),
-        ]
-        if all(params_from_server):
-            return params_from_server
-        else:
-            print('Something wrong with send photo to server')
+    response.raise_for_status()
+    response_extraction = response.json()
+    params_from_server = [
+        response_extraction.get('server'),
+        response_extraction.get('photo'),
+        response_extraction.get('hash'),
+    ]
+    if all(params_from_server):
+        return params_from_server
+    else:
+        print('Something wrong with send photo to server')
 
 
 def save_photo_to_wall(
-        url, group_id, access_token, server, photo, hash
+        url, group_id, access_token, server, photo, vk_hash
 ):
 
     params = {
         'server': server,
         'photo': photo,
-        'hash': hash,
+        'hash': vk_hash,
         'group_id': group_id,
         'access_token': access_token,
         'v': '5.131',
