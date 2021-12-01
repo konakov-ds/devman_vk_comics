@@ -155,15 +155,15 @@ def post_photo(
         server_url, wall_photo_url, wall_post_url
 ):
     img_server_url = get_wall_upload_server(server_url, group_id, access_token)
-    response_server = send_photo_to_server(
+    server_response = send_photo_to_server(
         img_server_url, dir_name, photo
     )
-    response_wall = save_photo_to_wall(
-        wall_photo_url, group_id, access_token, *response_server
+    wall_response = save_photo_to_wall(
+        wall_photo_url, group_id, access_token, *server_response
     )
 
     post_photo_to_wall(
-        wall_post_url, access_token, img_comment, group_id, *response_wall
+        wall_post_url, access_token, img_comment, group_id, *wall_response
     )
     os.remove(os.path.join(dir_name, photo))
 
@@ -182,8 +182,8 @@ if __name__ == '__main__':
     wall_photo_url = 'https://api.vk.com/method/photos.saveWallPhoto/'
     wall_post_url = 'https://api.vk.com/method/wall.post/'
 
-    amount_comics = get_amount_comics(xkcd_api_url)
-    comics_random_id = random.choice(range(amount_comics))
+    comics_amount = get_amount_comics(xkcd_api_url)
+    comics_random_id = random.choice(range(comics_amount))
 
     comics_img_comment, img_name = save_img(
         dir_name, comics_random_id
