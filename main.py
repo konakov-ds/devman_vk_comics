@@ -25,17 +25,6 @@ def get_amount_comics(url):
     return response_extraction['num']
 
 
-def create_comics_url(comics_id):
-    return f'https://xkcd.com/{comics_id}/info.0.json'
-
-
-def extract_comics_info(url):
-    response = requests.get(url)
-    response.raise_for_status()
-
-    return response.json()
-
-
 def load_img(img_url, name, dir_path):
 
     img_path = os.path.join(dir_path, name)
@@ -145,12 +134,18 @@ def post_photo_to_wall(
 def save_img(dir_name, comics_id):
     os.makedirs(dir_name, exist_ok=True)
 
-    comics_url = create_comics_url(comics_id)
-    comics_info = extract_comics_info(comics_url)
+    comics_url = f'https://xkcd.com/{comics_id}/info.0.json'
+
+    response = requests.get(comics_url)
+    response.raise_for_status()
+    comics_info = response.json()
+
     comics_img_url = comics_info['img']
     comics_img_comment = comics_info['alt']
     img_name = f'{comics_id}.png'
+
     load_img(comics_img_url, img_name, dir_name)
+
     return comics_img_comment, img_name
 
 
