@@ -1,7 +1,12 @@
+import logging
 import os
 import random
+import sys
 import requests
 from environs import Env
+
+
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 
 def get_amount_comics(url):
@@ -144,10 +149,10 @@ def post_photo_pipeline(
         wall_post_url, access_token, img_comment, group_id, *response_wall
     )
     if response_post.get('response'):
-        print('Successfully post photo!')
+        logging.info('Image successfully posted!')
         os.remove(os.path.join(dir_name, photo))
     else:
-        print('Something wrong with post photo to wall')
+        logging.error('Something wrong with post photo to wall')
 
 
 if __name__ == '__main__':
