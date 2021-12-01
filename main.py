@@ -9,6 +9,15 @@ from environs import Env
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 
+class VkApiError(Exception):
+    pass
+
+
+def raise_vk_api_error(response):
+    if response.get('error'):
+        raise VkApiError(f'Something wrong with vk api:\n{response["error"]}')
+
+
 def get_amount_comics(url):
     response = requests.get(url)
     response.raise_for_status()
@@ -50,7 +59,8 @@ def get_wall_upload_server(url, group_id, access_token):
     response = requests.get(url, params=params)
     response.raise_for_status()
     response_extraction = response.json()
-
+    raise_vk_api_error(response_extraction)
+    logging.info('Get url for upload image')
     return response_extraction['response']['upload_url']
 
 
@@ -63,6 +73,8 @@ def send_photo_to_server(url, dir_path, photo):
         response = requests.post(url, files=files)
     response.raise_for_status()
     response_extraction = response.json()
+    raise_vk_api_error(response_extraction)
+    logging.info('Send image to vk server')
     params_from_server = [
         response_extraction.get('server'),
         response_extraction.get('photo'),
@@ -90,6 +102,8 @@ def save_photo_to_wall(
     response = requests.post(url, params=params)
     response.raise_for_status()
     response_extraction = response.json()
+    raise_vk_api_error(response_extraction)
+    logging.info('Save image to vk wall')
 
     params_from_wall = [
         response_extraction['response'][0].get('owner_id'),
@@ -99,7 +113,7 @@ def save_photo_to_wall(
     if all(params_from_wall):
         return params_from_wall
     else:
-        print('Something wrong with save photo to wall')
+        logging.error('Something wrong with saving photo to wall')
 
 
 def post_photo_to_wall(
@@ -117,6 +131,10 @@ def post_photo_to_wall(
 
     response = requests.post(url, params=params)
     response.raise_for_status()
+    response_extraction = response.json()
+    raise_vk_api_error(response_extraction)
+
+    logging.info('Image successfully posted!')
 
     return response.json()
 
@@ -145,14 +163,10 @@ def post_photo_pipeline(
         wall_photo_url, group_id, access_token, *response_server
     )
 
-    response_post = post_photo_to_wall(
+    post_photo_to_wall(
         wall_post_url, access_token, img_comment, group_id, *response_wall
     )
-    if response_post.get('response'):
-        logging.info('Image successfully posted!')
-        os.remove(os.path.join(dir_name, photo))
-    else:
-        logging.error('Something wrong with post photo to wall')
+    os.remove(os.path.join(dir_name, photo))
 
 
 if __name__ == '__main__':
