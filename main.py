@@ -25,7 +25,7 @@ def get_comics_amount(url):
     return response_extraction['num']
 
 
-def load_img(img_url, name, dir_path):
+def download_img(img_url, name, dir_path):
 
     img_path = os.path.join(dir_path, name)
 
@@ -131,7 +131,7 @@ def post_photo_to_wall(
     return response.json()
 
 
-def save_img(dir_name, comics_id):
+def download_xkcd_img(dir_name, comics_id):
     os.makedirs(dir_name, exist_ok=True)
 
     comics_url = f'https://xkcd.com/{comics_id}/info.0.json'
@@ -144,7 +144,7 @@ def save_img(dir_name, comics_id):
     comics_img_comment = comics_info['alt']
     img_name = f'{comics_id}.png'
 
-    load_img(comics_img_url, img_name, dir_name)
+    download_img(comics_img_url, img_name, dir_name)
 
     return comics_img_comment, img_name
 
@@ -178,7 +178,7 @@ if __name__ == '__main__':
     comics_amount = get_comics_amount(xkcd_api_url)
     random_comics_id = random.randint(1, comics_amount)
 
-    comics_img_comment, img_name = save_img(
+    comics_img_comment, img_name = download_xkcd_img(
         vk_img_dir, random_comics_id
     )
 
