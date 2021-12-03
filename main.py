@@ -6,9 +6,6 @@ import requests
 from environs import Env
 
 
-logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-
-
 class VkApiError(Exception):
     pass
 
@@ -101,10 +98,8 @@ def save_photo_to_wall(
         response_extraction['response'][0].get('id'),
     ]
 
-    if all(params_from_wall):
-        return params_from_wall
-    else:
-        logging.error('Something wrong with saving photo to wall')
+    return params_from_wall
+
 
 
 def post_photo_to_wall(
@@ -165,6 +160,8 @@ def post_photo(
 
 
 if __name__ == '__main__':
+
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
     env = Env()
     env.read_env()
