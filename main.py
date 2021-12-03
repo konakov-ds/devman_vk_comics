@@ -139,7 +139,7 @@ def download_xkcd_img(dir_name, comics_id):
     comics_img_comment = comics_extraction['alt']
     comics_img_name = f'{comics_id}.png'
 
-    download_img(comics_img_url, img_name, dir_name)
+    download_img(comics_img_url, comics_img_name, dir_name)
 
     return comics_img_comment, comics_img_name
 
@@ -156,7 +156,6 @@ def post_photo(
     post_photo_to_wall(
         access_token, img_comment, group_id, *wall_response
     )
-    os.remove(os.path.join(dir_name, photo))
 
 
 if __name__ == '__main__':
@@ -175,10 +174,14 @@ if __name__ == '__main__':
     comics_amount = get_comics_amount(xkcd_api_url)
     random_comics_id = random.randint(1, comics_amount)
 
-    comics_img_comment, comics_img_name = download_xkcd_img(
-        vk_img_dir, random_comics_id
-    )
-
-    post_photo(
-        vk_img_dir, comics_img_name, comics_img_comment, vk_group_id, vk_access_token
-    )
+    try:
+        comics_img_comment, comics_img_name = download_xkcd_img(
+            vk_img_dir, random_comics_id
+        )
+        post_photo(
+            vk_img_dir, comics_img_name, comics_img_comment, vk_group_id, vk_access_token
+        )
+    except Exception as e:
+        logging.error(f'Program run with error:\n{e}')
+    finally:
+        os.remove(os.path.join(vk_img_dir, comics_img_name))
