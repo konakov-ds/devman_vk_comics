@@ -133,15 +133,15 @@ def download_xkcd_img(dir_name, comics_id):
 
     response = requests.get(comics_url)
     response.raise_for_status()
-    comics_info = response.json()
+    comics_extraction = response.json()
 
-    comics_img_url = comics_info['img']
-    comics_img_comment = comics_info['alt']
-    img_name = f'{comics_id}.png'
+    comics_img_url = comics_extraction['img']
+    comics_img_comment = comics_extraction['alt']
+    comics_img_name = f'{comics_id}.png'
 
     download_img(comics_img_url, img_name, dir_name)
 
-    return comics_img_comment, img_name
+    return comics_img_comment, comics_img_name
 
 
 def post_photo(
@@ -167,7 +167,7 @@ if __name__ == '__main__':
     env.read_env()
 
     vk_access_token = env('VK_ACCESS_TOKEN')
-    group_id = env('VK_GROUP_ID')
+    vk_group_id = env('VK_GROUP_ID')
     vk_img_dir = env('VK_IMG_DIR')
 
     xkcd_api_url = 'https://xkcd.com/info.0.json'
@@ -175,10 +175,10 @@ if __name__ == '__main__':
     comics_amount = get_comics_amount(xkcd_api_url)
     random_comics_id = random.randint(1, comics_amount)
 
-    comics_img_comment, img_name = download_xkcd_img(
+    comics_img_comment, comics_img_name = download_xkcd_img(
         vk_img_dir, random_comics_id
     )
 
     post_photo(
-        vk_img_dir, img_name, comics_img_comment, group_id, vk_access_token
+        vk_img_dir, comics_img_name, comics_img_comment, vk_group_id, vk_access_token
     )
