@@ -15,8 +15,9 @@ def raise_vk_api_error(response):
         raise VkApiError(f'Something wrong with vk api:\n{response["error"]}')
 
 
-def get_comics_amount(url):
-    response = requests.get(url)
+def get_comics_amount():
+    xkcd_api_url = 'https://xkcd.com/info.0.json'
+    response = requests.get(xkcd_api_url)
     response.raise_for_status()
     response_extraction = response.json()
     return response_extraction['num']
@@ -101,7 +102,6 @@ def save_photo_to_wall(
     return params_from_wall
 
 
-
 def post_photo_to_wall(
         access_token, message, group_id, owner_id, media_id
 ):
@@ -169,9 +169,7 @@ if __name__ == '__main__':
     vk_group_id = env('VK_GROUP_ID')
     vk_img_dir = env('VK_IMG_DIR')
 
-    xkcd_api_url = 'https://xkcd.com/info.0.json'
-
-    comics_amount = get_comics_amount(xkcd_api_url)
+    comics_amount = get_comics_amount()
     random_comics_id = random.randint(1, comics_amount)
 
     try:
