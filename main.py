@@ -170,8 +170,8 @@ if __name__ == '__main__':
     env.read_env()
 
     vk_access_token = env('VK_ACCESS_TOKEN')
-    group_id = env('GROUP_ID')
-    dir_name = env('DIR_NAME')
+    group_id = env('VK_GROUP_ID')
+    dir_name = env('VK_IMG_DIR')
 
     xkcd_api_url = 'https://xkcd.com/info.0.json'
 

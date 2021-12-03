@@ -16,18 +16,18 @@
 ```
 В файле .env нужно будет прописать следующие переменные:
 ```
-ACCESS_TOKEN=dfd***239
+VK_ACCESS_TOKEN=dfd***239
 ```
 - ключ доступа пользователя, можно получить [здесь](https://vk.com/dev/implicit_flow_user).
 - так как вы используете standalone приложение, для получения ключа пользователя стоит использовать Implicit Flow.
 - убрать параметр redirect_uri у запроса на ключ.
 - Параметр scope указать через запятую, вот так: scope=photos,groups,wall,offline
 ```
-GROUP_ID=209178468
+VK_GROUP_ID=209178468
 ```
 - id вашего сообщества в vk.
 ```
-DIR_NAME=xkcd_images
+VK_IMG_DIR=xkcd_images
 ```
 - название папки, куда будут временно сохраняться изображения из xkcd.
   
