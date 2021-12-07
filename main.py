@@ -4,6 +4,7 @@ import random
 import sys
 import requests
 from environs import Env
+from requests.exceptions import MissingSchema, HTTPError
 
 
 class VkApiError(Exception):
@@ -176,10 +177,15 @@ if __name__ == '__main__':
         comics_img_comment, comics_img_name = download_xkcd_img(
             vk_img_dir, random_comics_id
         )
-        post_photo(
-            vk_img_dir, comics_img_name, comics_img_comment, vk_group_id, vk_access_token
-        )
-    except Exception as e:
-        logging.error(f'Program run with error:\n{e}')
-    finally:
-        os.remove(os.path.join(vk_img_dir, comics_img_name))
+    except (KeyError, MissingSchema, HTTPError) as e:
+        logging.error(f'Error with download img from xkcd:\n{e}')
+    else:
+        try:
+            post_photo(
+                vk_img_dir, comics_img_name, comics_img_comment, vk_group_id, vk_access_token
+            )
+        except HTTPError as e:
+            logging.error(f'Error with posted img to vk wall:\n{e}')
+
+        finally:
+            os.remove(os.path.join(vk_img_dir, comics_img_name))
